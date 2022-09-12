@@ -1,0 +1,8 @@
+port: 8080
+environment: dev
+logger:
+  loglevel: info
+  filename: server.log
+db:
+  mysql:
+    port: 3306

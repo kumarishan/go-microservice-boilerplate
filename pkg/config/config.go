@@ -12,14 +12,13 @@ type Config struct {
 
 	Logger struct {
 		LogLevel string `default:"info"`
-		FileName string `default:"blocksphere-server.log"`
+		FileName string `default:"server.log"`
 	}
 
 	DB struct {
-		// MongoDB struct {
-		// 	URI      string `default:"mongodb://localhost:27017"`
-		// 	Database string `default:"blocksphere"`
-		// }
+		MySql struct {
+			Database string `default:"catalog"`
+		}
 	}
 }
 
@@ -28,6 +27,7 @@ func NewConfig() (*Config, error) {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
+
 	viper.AddConfigPath("./config/")
 	viper.AddConfigPath(".")
 

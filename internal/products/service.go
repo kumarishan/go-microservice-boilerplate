@@ -2,6 +2,7 @@ package products
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kumarishan/errors"
 	"github.com/kumarishan/go-microservice-boilerplate/pkg/di"
@@ -12,6 +13,7 @@ import (
 // Service defines interface for project service
 type Service interface {
 	GetProduct(ctx context.Context, id string) (*Product, error)
+	AddProduct(ctx context.Context, name string) (*Product, error)
 }
 
 var _ = di.Provide(NewService)
@@ -29,6 +31,10 @@ func NewService(logger *logger.Logger, repo Repository) Service {
 }
 
 func (s *service) GetProduct(ctx context.Context, id string) (*Product, error) {
+	if err := ValidateProductId(id); err != nil {
+		return nil, err
+	}
+
 	product, err := s.repo.FindById(ctx, id)
 	if err != nil {
 		if errors.Is(err, repo.ErrRecordNotFound) {
@@ -38,5 +44,20 @@ func (s *service) GetProduct(ctx context.Context, id string) (*Product, error) {
 		return nil, errors.Return(errors.ErrInternal, err, "some internal error occured. please try again.")
 	}
 
+	return product, nil
+}
+
+// AddProduct implements Service
+func (s *service) AddProduct(ctx context.Context, name string) (*Product, error) {
+	if err := ValidateProductName(name, true); err != nil {
+		return nil, errors.Return(errors.ErrInvalidInput, err, err.Error())
+	}
+
+	product := NewProduct(name)
+
+	if _, err := s.repo.Save(ctx, product); err != nil {
+		return nil, errors.Return(ErrAddingNewProduct, err, fmt.Sprintf("error adding new product %s", name))
+
+	}
 	return product, nil
 }
