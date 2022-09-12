@@ -15,7 +15,7 @@ var _ = di.Provide(NewProductsController)
 // Controller is a products controller interface
 type Controller interface {
 	GetProduct(ctx *gin.Context) (int, *ProductDto, error)
-	AddProduct(ctx *gin.Context, request AddProductRequest) (int, *ProductDto, error)
+	AddProduct(ctx *gin.Context) (int, *ProductDto, error)
 }
 
 // impl
@@ -52,7 +52,12 @@ func (p *controller) GetProduct(ctx *gin.Context) (int, *ProductDto, error) {
 }
 
 // AddProduct implements Controller
-func (p *controller) AddProduct(ctx *gin.Context, request AddProductRequest) (int, *ProductDto, error) {
+func (p *controller) AddProduct(ctx *gin.Context) (int, *ProductDto, error) {
+
+	var request AddProductRequest
+	if err := ctx.BindJSON(&request); err != nil {
+		return http.StatusBadRequest, nil, err
+	}
 
 	if err := request.Validate(); err != nil {
 		return http.StatusBadRequest, nil, err

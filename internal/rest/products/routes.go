@@ -36,6 +36,6 @@ func (r *ProductRoutes) SetupRoutes() {
 	{
 		// routes.GET("/", rest.GinHandler(r.controller.ListProducts))
 		routes.GET("/:id", rest.GinHandler(r.controller.GetProduct))
-		// routes.POST("/", rest.GinHandler(r.controller.AddProduct))
+		routes.POST("/", rest.GinHandler(r.controller.AddProduct))
 	}
 }

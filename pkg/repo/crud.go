@@ -7,7 +7,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type CrudRepository[E any, ID any, M GormModel[E, ID]] interface {
+type PtrGormModel[E any, M any] interface {
+	GormModel[E]
+	*M
+}
+
+type CrudRepository[E any, ID any, M any, PT PtrGormModel[E, M]] interface {
 	// Count(ctx context.Context) (uint64, error)
 	// Delete(ctx context.Context, entity *E) error
 	// DeleteAll(ctx context.Context) error
@@ -27,25 +32,25 @@ type CrudRepository[E any, ID any, M GormModel[E, ID]] interface {
 }
 
 //  for checking if interface is implemented, not for usage
-func interfaceCheck[E any, ID any, M GormModel[E, ID]]() CrudRepository[E, ID, M] {
-	return &CrudRepositoryImpl[E, ID, M]{
+func interfaceCheck[E any, ID any, M any, PT PtrGormModel[E, M]]() CrudRepository[E, ID, M, PT] {
+	return &CrudRepositoryImpl[E, ID, M, PT]{
 		db: nil,
 	}
 }
 
-func NewCrudRepositoryImpl[E any, ID any, M GormModel[E, ID]](db *gorm.DB) *CrudRepositoryImpl[E, ID, M] {
-	return &CrudRepositoryImpl[E, ID, M]{
+func NewCrudRepositoryImpl[E any, ID any, M any, PT PtrGormModel[E, M]](db *gorm.DB) *CrudRepositoryImpl[E, ID, M, PT] {
+	return &CrudRepositoryImpl[E, ID, M, PT]{
 		db: db,
 	}
 }
 
-type CrudRepositoryImpl[E any, ID any, M GormModel[E, ID]] struct {
+type CrudRepositoryImpl[E any, ID any, M any, PT PtrGormModel[E, M]] struct {
 	db *gorm.DB
 }
 
-func (r *CrudRepositoryImpl[E, ID, M]) Save(ctx context.Context, entity *E) (*E, error) {
-	var model M
-	model = model.FromEntity(entity).(M)
+func (r *CrudRepositoryImpl[E, ID, M, PT]) Save(ctx context.Context, entity *E) (*E, error) {
+	var model = PT(new(M))
+	model = model.FromEntity(entity).(PT)
 
 	err := r.db.WithContext(ctx).Create(model).Error
 	if err != nil {
@@ -55,19 +60,19 @@ func (r *CrudRepositoryImpl[E, ID, M]) Save(ctx context.Context, entity *E) (*E,
 	return model.ToEntity(), nil
 }
 
-func (r *CrudRepositoryImpl[E, ID, M]) FindById(ctx context.Context, id ID) (*E, error) {
-	var model M
-	err := r.db.WithContext(ctx).First(&model, id).Error
+func (r *CrudRepositoryImpl[E, ID, M, PT]) FindById(ctx context.Context, id ID) (*E, error) {
+	var model = PT(new(M))
+	err := r.db.WithContext(ctx).First(model, "id = ?", id).Error
 	if err != nil {
 		return nil, errors.Return(err, nil, "")
 	}
 	return model.ToEntity(), nil
 }
 
-func (r *CrudRepositoryImpl[E, ID, M]) FindAll(ctx context.Context, limit int, offset int) ([]*E, error) {
+func (r *CrudRepositoryImpl[E, ID, M, PT]) FindAll(ctx context.Context, limit int, offset int) ([]*E, error) {
 	return nil, nil
 }
 
-func (r *CrudRepositoryImpl[E, ID, M]) Scopes(ctx context.Context, scopes ...func(*gorm.DB) *gorm.DB) *gorm.DB {
+func (r *CrudRepositoryImpl[E, ID, M, PT]) Scopes(ctx context.Context, scopes ...func(*gorm.DB) *gorm.DB) *gorm.DB {
 	return r.db.Scopes(scopes...)
 }

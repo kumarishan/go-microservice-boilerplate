@@ -31,9 +31,9 @@ func NewService(logger *logger.Logger, repo Repository) Service {
 }
 
 func (s *service) GetProduct(ctx context.Context, id string) (*Product, error) {
-	if err := ValidateProductId(id); err != nil {
-		return nil, err
-	}
+	// if err := ValidateProductId(id); err != nil {
+	// 	return nil, err
+	// }
 
 	product, err := s.repo.FindById(ctx, id)
 	if err != nil {
