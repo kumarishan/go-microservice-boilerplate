@@ -6,7 +6,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-const productIdRegex = "^prd_[0-9a-v]{20}$"
+const productIdRegex = "^[0-9a-v]{20}$"
 
 func ValidateProductId(id string) error {
 	return validation.Validate(id,
