@@ -14,6 +14,7 @@ import (
 type Service interface {
 	GetProduct(ctx context.Context, id string) (*Product, error)
 	AddProduct(ctx context.Context, name string) (*Product, error)
+	GetProducts(ctx context.Context, limit int, offset int) ([]*Product, error)
 }
 
 var _ = di.Provide(NewService)
@@ -60,4 +61,15 @@ func (s *service) AddProduct(ctx context.Context, name string) (*Product, error)
 
 	}
 	return product, nil
+}
+
+func (s *service) GetProducts(ctx context.Context, limit int, offset int) ([]*Product, error) {
+	if limit < 0 && offset < 0 {
+		return nil, errors.Return(errors.ErrInvalidInput, nil, "limit and offset cannot be less than 0")
+	}
+	products, err := s.repo.FindAll(ctx, limit, offset)
+	if err != nil {
+		return nil, errors.Return(errors.ErrInternal, err, "some internal errror occurred. please try again")
+	}
+	return products, nil
 }

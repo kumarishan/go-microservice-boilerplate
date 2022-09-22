@@ -1,5 +1,7 @@
 package products
 
+import "github.com/kumarishan/go-microservice-boilerplate/pkg/repo"
+
 type ProductId string
 
 func (p ProductId) String() string {
@@ -7,9 +9,9 @@ func (p ProductId) String() string {
 }
 
 type Product struct {
-	ID     ProductId
-	Name   string
-	Status string
+	repo.Model[ProductId]
+	Name   string `gorm:"index"`
+	Status Status `gorm:"index"`
 }
 
 type Status uint

@@ -34,7 +34,7 @@ func NewProductRoutes(params ProductRoutesParams) rest.Routes {
 func (r *ProductRoutes) SetupRoutes() {
 	routes := r.api.Group("/products")
 	{
-		// routes.GET("/", rest.GinHandler(r.controller.ListProducts))
+		routes.GET("/", rest.GinHandler(r.controller.GetProducts))
 		routes.GET("/:id", rest.GinHandler(r.controller.GetProduct))
 		routes.POST("/", rest.GinHandler(r.controller.AddProduct))
 	}

@@ -2,9 +2,11 @@ package products
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kumarishan/errors"
+
 	"github.com/kumarishan/go-microservice-boilerplate/internal/products"
 	"github.com/kumarishan/go-microservice-boilerplate/pkg/di"
 	"github.com/kumarishan/go-microservice-boilerplate/pkg/logger"
@@ -16,6 +18,7 @@ var _ = di.Provide(NewProductsController)
 type Controller interface {
 	GetProduct(ctx *gin.Context) (int, *ProductDto, error)
 	AddProduct(ctx *gin.Context) (int, *ProductDto, error)
+	GetProducts(ctx *gin.Context) (int, []*ProductDto, error)
 }
 
 // impl
@@ -69,9 +72,26 @@ func (p *controller) AddProduct(ctx *gin.Context) (int, *ProductDto, error) {
 		return http.StatusInternalServerError, nil, err
 	}
 
-	return http.StatusOK, &ProductDto{
-		Id:   product.ID.String(),
-		Name: product.Name,
-	}, nil
+	return http.StatusOK, MapProductToProductDto(product), nil
 
+}
+
+func (p *controller) GetProducts(ctx *gin.Context) (int, []*ProductDto, error) {
+
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
+
+	offset, err := strconv.Atoi(ctx.DefaultQuery("offset", "0"))
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
+
+	products, err := p.service.GetProducts(ctx, limit, offset)
+	if err != nil {
+		return http.StatusInternalServerError, nil, err
+	}
+
+	return http.StatusOK, MapProductsToProductDtos(products), nil
 }
