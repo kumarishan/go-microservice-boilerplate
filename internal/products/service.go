@@ -49,7 +49,7 @@ func (s *service) GetProduct(ctx context.Context, id string) (*Product, error) {
 
 // AddProduct implements Service
 func (s *service) AddProduct(ctx context.Context, name string) (*Product, error) {
-	if err := ValidateProductName(name, true); err != nil {
+	if err := ValidateProductName(name); err != nil {
 		return nil, errors.Return(errors.ErrInvalidInput, err, err.Error())
 	}
 

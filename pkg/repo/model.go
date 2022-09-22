@@ -14,7 +14,7 @@ type Model[ID any] struct {
 }
 
 // todo - dirty checkers
-type GormModel[E any] interface {
-	ToEntity() *E
-	FromEntity(entity *E) interface{}
+type GormModel[E any, M any] interface {
+	MapToEntity() *E
+	MapFromEntity(entity *E) *M
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type PtrGormModel[E any, M any] interface {
-	GormModel[E]
+	GormModel[E, M]
 	*M
 }
 
@@ -50,14 +50,14 @@ type CrudRepositoryImpl[E any, ID any, M any, PT PtrGormModel[E, M]] struct {
 
 func (r *CrudRepositoryImpl[E, ID, M, PT]) Save(ctx context.Context, entity *E) (*E, error) {
 	var model = PT(new(M))
-	model = model.FromEntity(entity).(PT)
+	model = model.MapFromEntity(entity)
 
 	err := r.db.WithContext(ctx).Create(model).Error
 	if err != nil {
 		return nil, errors.Return(err, nil, "")
 	}
 
-	return model.ToEntity(), nil
+	return model.MapToEntity(), nil
 }
 
 func (r *CrudRepositoryImpl[E, ID, M, PT]) FindById(ctx context.Context, id ID) (*E, error) {
@@ -66,7 +66,7 @@ func (r *CrudRepositoryImpl[E, ID, M, PT]) FindById(ctx context.Context, id ID) 
 	if err != nil {
 		return nil, errors.Return(err, nil, "")
 	}
-	return model.ToEntity(), nil
+	return model.MapToEntity(), nil
 }
 
 func (r *CrudRepositoryImpl[E, ID, M, PT]) FindAll(ctx context.Context, limit int, offset int) ([]*E, error) {
