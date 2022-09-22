@@ -17,26 +17,40 @@ type Product struct {
 type Status uint
 
 const (
-	StatusActive Status = iota
+	StatusUnknown Status = iota
+	StatusActive
 	StatusInActive
 )
 
-func (s Status) String() (ret string) {
-	switch s {
-	case StatusActive:
-		ret = "Active"
-	case StatusInActive:
-		ret = "InActive"
-	}
-	return
+func (p *Product) IsActive() bool {
+	return p.Status == StatusActive
 }
 
-func StatusFor(status string) (s Status) {
+func (p *Product) SetStatus(status Status) bool {
+	// sample logic to showacase pointer methods, will be building a complete state machine
+	if status == StatusActive && p.Status == StatusInActive {
+		p.Status = StatusActive
+		return true
+	}
+	return false
+}
+
+func (s Status) String() string {
+	switch s {
+	case StatusActive:
+		return "Active"
+	case StatusInActive:
+		return "InActive"
+	}
+	return "Unknown"
+}
+
+func StatusFor(status string) Status {
 	switch status {
 	case "Active":
-		s = StatusActive
+		return StatusActive
 	case "InActive":
-		s = StatusInActive
+		return StatusInActive
 	}
-	return
+	return StatusUnknown
 }

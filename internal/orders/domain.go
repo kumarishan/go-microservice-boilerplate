@@ -1,6 +1,9 @@
 package orders
 
-import "github.com/kumarishan/go-microservice-boilerplate/internal/products"
+import (
+	"github.com/kumarishan/go-microservice-boilerplate/internal/products"
+	"github.com/kumarishan/go-microservice-boilerplate/pkg/repo"
+)
 
 type OrderId string
 
@@ -9,6 +12,6 @@ func (oi OrderId) String() string {
 }
 
 type Order struct {
-	ID    OrderId
+	repo.Model[OrderId]
 	Items []products.Product
 }
