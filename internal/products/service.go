@@ -36,7 +36,7 @@ func (s *service) GetProduct(ctx context.Context, id string) (*Product, error) {
 		return nil, err
 	}
 
-	product, err := s.repo.FindById(ctx, id)
+	product, err := s.repo.FindById(ctx, ProductId(id))
 	if err != nil {
 		if errors.Is(err, repo.ErrRecordNotFound) {
 			return nil, errors.Return(ErrProductNotFound, err, "")

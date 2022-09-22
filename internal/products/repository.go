@@ -12,7 +12,7 @@ import (
 )
 
 type Repository interface {
-	repo.CrudRepository[Product, string]
+	repo.CrudRepository[Product, ProductId]
 
 	FindByName(ctx context.Context, name string) ([]Product, error)
 }
@@ -20,7 +20,7 @@ type Repository interface {
 var _ = di.Provide(NewRepo)
 
 type repository struct {
-	*repo.CrudRepositoryImpl[Product, string]
+	*repo.CrudRepositoryImpl[Product, ProductId]
 	db *gorm.DB
 }
 
@@ -30,7 +30,7 @@ type RepoParams struct {
 }
 
 func NewRepo(params RepoParams) Repository {
-	impl := repo.NewCrudRepositoryImpl[Product, string](params.Db)
+	impl := repo.NewCrudRepositoryImpl[Product, ProductId](params.Db)
 	return &repository{
 		impl,
 		params.Db,
